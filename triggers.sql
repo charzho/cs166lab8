@@ -1,0 +1,15 @@
+DROP TRIGGER IF EXISTS populate ON part_nyc;
+CREATE SEQUENCE part_number_seq START WITH 50000;
+
+CREATE OR REPLACE LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION increm() RETURNS "trigger" AS 
+$BODY$
+BEGIN
+	NEW.part_number = nextval('part_number_seq');
+	RETURN NEW;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+CREATE TRIGGER populate BEFORE INSERT ON part_nyc
+FOR EACH ROW EXECUTE PROCEDURE increm();
